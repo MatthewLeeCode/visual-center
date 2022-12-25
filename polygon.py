@@ -3,7 +3,7 @@ import cv2
 import numpy as np
 
 
-def distance_to_poly(point: np.ndarray, shell: np.ndarray, holes:list[np.ndarray]=[]) -> float|None:
+def signed_distance(point: np.ndarray, shell: np.ndarray, holes:list[np.ndarray]=[]) -> float:
     """ Calculates the distance from a point to the polygon edge.
     
     Works for any polygon, including with holes.
@@ -16,28 +16,21 @@ def distance_to_poly(point: np.ndarray, shell: np.ndarray, holes:list[np.ndarray
 
         
     Returns:
-        The minimum distance to the polygon edge, or None if the point is outside the polygon.
+        The minimum distance to the polygon edge. Positive if the point is inside the polygon, negative if outside.
     """
-    # Ensure point is uint8
+    # Ensure point is of type uint8
     point = point.astype(np.uint8)
     
     # Calculate the distance to the shell
-    min_dist = cv2.pointPolygonTest(shell, point, True)
-    
-    # If dist is negative, the point is outside the polygon
-    if min_dist < 0:
-        return None
-    
-    # Check the dist to the holes
+    min_dist = cv2.pointPolygonTest(shell, point, True)  
+
     for hole in holes:
         # We need to invert the distance, since we dont want the point inside the hole
         hole_dist = cv2.pointPolygonTest(hole, point, True) * -1
-        # If the hole distance is negative, the point is inside the hole (Outside the polygon)
-        if hole_dist < 0:
-            return None
         # Get the minimum distance
-        min_dist = min(min_dist, hole_dist)    
-
+        if abs(hole_dist) < abs(min_dist):
+            min_dist = hole_dist
+        
     return min_dist
 
 
