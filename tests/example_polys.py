@@ -9,9 +9,10 @@ The following polygons can be created:
 Additionally, any polygon can be used as a hole in any other polygon.
 """
 import numpy as np
+from polygon import Polygon
 
 
-def create_rectangle(width: int, height: int) -> np.ndarray:
+def create_rectangle(width: int, height: int) -> Polygon:
     """ Creates a rectangle with the given width and height.
 
     Args:
@@ -19,17 +20,17 @@ def create_rectangle(width: int, height: int) -> np.ndarray:
         height (int): The height of the rectangle.
 
     Returns:
-        A numpy array of shape (4, 2) representing the rectangle.
+        A Polygon of the rectangle.
     """
-    return np.array([
+    return Polygon(np.array([
         [0, 0],
         [width, 0],
         [width, height],
         [0, height]
-    ])
+    ]))
     
 
-def create_circle(radius: int, num_points: int = 100) -> np.ndarray:
+def create_circle(radius: int, num_points: int = 100) -> Polygon:
     """ Creates a circle with the given radius.
 
     Args:
@@ -37,7 +38,7 @@ def create_circle(radius: int, num_points: int = 100) -> np.ndarray:
         num_points (int): The number of points to use to approximate the circle.
 
     Returns:
-        A numpy array of shape (num_points, 2) representing the circle.
+        A Polygon of the circle.
     """
     # Create a circle with the given radius
     circle = np.zeros((num_points, 2), dtype=np.float32)
@@ -45,17 +46,17 @@ def create_circle(radius: int, num_points: int = 100) -> np.ndarray:
         angle = 2 * np.pi * i / num_points
         circle[i, 0] = radius * np.cos(angle)
         circle[i, 1] = radius * np.sin(angle)
-    return circle
+    return Polygon(circle)
 
 
-def create_hexagon(radius: int) -> np.ndarray:
+def create_hexagon(radius: int) -> Polygon:
     """ Creates a hexagon with the given radius.
 
     Args:
         radius (int): The radius of the hexagon.
 
     Returns:
-        A numpy array of shape (6, 2) representing the hexagon.
+        A Polygon of the hexagon.
     """
     # Create a hexagon with the given radius
     hexagon = np.zeros((6, 2), dtype=np.float32)
@@ -63,10 +64,10 @@ def create_hexagon(radius: int) -> np.ndarray:
         angle = 2 * np.pi * i / 6
         hexagon[i, 0] = radius * np.cos(angle)
         hexagon[i, 1] = radius * np.sin(angle)
-    return hexagon
+    return Polygon(hexagon)
 
 
-def create_donut(inner_radius: int, outer_radius: int, num_points: int = 100) -> tuple[np.ndarray, list[np.ndarray]]:
+def create_donut(inner_radius: int, outer_radius: int, num_points: int = 100) -> Polygon:
     """ Creates a donut with the given inner and outer radius.
 
     Args:
@@ -75,20 +76,19 @@ def create_donut(inner_radius: int, outer_radius: int, num_points: int = 100) ->
         num_points (int): The number of points to use to approximate the circle.
 
     Returns:
-        np.ndarray: A numpy array of shape (num_points, 2) representing the outer circle (Shell)
-        list[np.ndarray]: A list of numpy arrays of shape (num_points, 2) representing the inner circle (Hole)
+        np.ndarray: A Polygon of the donut
     """
-    return create_circle(outer_radius, num_points), [create_circle(inner_radius, num_points)]
+    return Polygon(create_circle(outer_radius, num_points), [create_circle(inner_radius, num_points)])
 
 
-def create_concave(num_points: int = 100) -> np.ndarray:
+def create_concave(num_points: int = 100) -> Polygon:
     """ Creates a concave polygon.
 
     Args:
         num_points (int): The number of points to use to approximate the polygon.
 
     Returns:
-        A numpy array of shape (num_points, 2) representing the polygon.
+        A Polygon of the polygon.
     """
     # Create a concave polygon
     concave = np.zeros((num_points, 2), dtype=np.float32)
@@ -96,4 +96,18 @@ def create_concave(num_points: int = 100) -> np.ndarray:
         angle = 2 * np.pi * i / num_points
         concave[i, 0] = 100 * np.cos(angle) + 50 * np.cos(5 * angle)
         concave[i, 1] = 100 * np.sin(angle) + 50 * np.sin(5 * angle)
-    return concave
+    return Polygon(concave)
+
+
+def create_hole(polygon: Polygon, hole: Polygon) -> Polygon:
+    """ Creates a hole in the given polygon.
+
+    Args:
+        polygon (Polygon): The polygon to create the hole in.
+        hole (Polygon): The hole to create.
+
+    Returns:
+        A Polygon of the polygon with the hole.
+    """
+    polygon.holes.append(hole.shell)
+    return polygon

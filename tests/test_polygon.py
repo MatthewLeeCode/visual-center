@@ -1,12 +1,12 @@
 import cv2
 import numpy as np
-from polygon import signed_distance, get_polygon_key_points
-import tests.example_polys as poly
+from polygon import Polygon
+import tests.example_polys as example_poly
 
 
 def test_distance_square() -> None:
     """ Tests the distance from a point to a square. """
-    square = poly.create_rectangle(100, 100)
+    square = example_poly.create_rectangle(100, 100)
     
     # Points to calculate distance with
     points = np.array([
@@ -31,19 +31,21 @@ def test_distance_square() -> None:
     ])
     
     for p, d in zip(points, expected_dists):
-        dist = signed_distance(p, square)
+        dist = square.signed_distance(p)
         assert dist == d, f"Expected distance {d}, got {dist}."
         
 
 def test_distance_square_with_hole() -> None:
     """ Tests the distance from a point to a square with a hole. """
-    square = poly.create_rectangle(100, 100)
+    square = example_poly.create_rectangle(100, 100)
     
     # Creates a hole in the top left corner
-    hole = poly.create_rectangle(50, 50)
+    hole = example_poly.create_rectangle(50, 50)
     
     # Translates hole 25 to the right and down
-    hole =  np.array([p + [25, 25] for p in hole])
+    hole.shell =  np.array([p + [25, 25] for p in hole.shell])
+    
+    square = example_poly.create_hole(square, hole)
     
     # Points to calculate distance with
     points = np.array([
@@ -68,14 +70,14 @@ def test_distance_square_with_hole() -> None:
     ])
     
     for p, d in zip(points, expected_dists):
-        dist = signed_distance(p, square, holes=[hole])
+        dist = square.signed_distance(p)
         assert dist == d, f"Expected distance {d}, got {dist}."
 
 
 def test_get_polygon_key_points() -> None:
     """ Tests the key points of a square. """
-    square = poly.create_rectangle(100, 100)
-    key_points = get_polygon_key_points(square)
+    square = example_poly.create_rectangle(100, 100)
+    key_points = square._get_key_points()
     
     # Expected key points 
     # [x, y, width, height]
@@ -87,8 +89,8 @@ def test_get_polygon_key_points() -> None:
     assert np.all(key_points == expected_key_points), f"Expected key points {expected_key_points}, got {key_points}."
     
     # Test with a circle
-    circle = poly.create_circle(100, 50)
-    key_points = get_polygon_key_points(circle)
+    circle = example_poly.create_circle(100, 50)
+    key_points = circle._get_key_points()
     
     # Expected key points
     expected_key_points = np.array([0, 0, 201, 200])
