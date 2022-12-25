@@ -17,11 +17,14 @@ def distance_to_poly(point: np.ndarray, shell: np.ndarray, holes:list[np.ndarray
     Returns:
         The minimum distance to the polygon edge, or None if the point is outside the polygon.
     """
+    # Ensure point is uint8
+    point = point.astype(np.uint8)
+    
     # Calculate the distance to the shell
     min_dist = cv2.pointPolygonTest(shell, point, True)
     
     # If dist is negative, the point is outside the polygon
-    if dist < 0:
+    if min_dist < 0:
         return None
     
     # Check the dist to the holes
@@ -32,6 +35,6 @@ def distance_to_poly(point: np.ndarray, shell: np.ndarray, holes:list[np.ndarray
         if hole_dist < 0:
             return None
         # Get the minimum distance
-        dist = min(dist, hole_dist)    
+        min_dist = min(min_dist, hole_dist)    
 
-    return dist
+    return min_dist
