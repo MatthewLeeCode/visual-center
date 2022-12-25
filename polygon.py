@@ -1,3 +1,4 @@
+""" Functions for working with polygons."""
 import cv2
 import numpy as np
 
@@ -38,3 +39,23 @@ def distance_to_poly(point: np.ndarray, shell: np.ndarray, holes:list[np.ndarray
         min_dist = min(min_dist, hole_dist)    
 
     return min_dist
+
+
+def get_polygon_key_points(polygon: np.ndarray) -> list[np.ndarray]:
+    """ Gets the key points of a polygon.
+    
+    Key points: x, y (centroid), width, height
+    
+    Args:
+        polygon (np.ndarray): The polygon to get the key points from.
+            Holes are not required as they are not used in the calculation
+    
+    Returns:
+        A list of key points. [x(int), y(int), width(int), height(int)]
+    """
+    # Get the bounding box
+    x, y, width, height = cv2.boundingRect(polygon)
+    # Get the centroid
+    centroid = np.array([x + width/2, y + height/2], dtype=np.uint8)
+    # Return the key points
+    return [*centroid, width, height] # Width and height are always 1 more for some reason
