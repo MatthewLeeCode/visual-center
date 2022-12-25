@@ -1,15 +1,18 @@
 import cv2
+import numpy as np
 
 
-def distance_to_poly(point, shell, holes=[]) -> float|None:
+def distance_to_poly(point: np.ndarray, shell: np.ndarray, holes:list[np.ndarray]=[]) -> float|None:
     """ Calculates the distance from a point to the polygon edge.
     
     Works for any polygon, including with holes.
     
     Args:
-        point: The point to calculate the distance to.
-        shell: The shell of the polygon.
-        holes: The holes in the polygon.
+        point (np.ndarray): The point to calculate the distance to.
+        shell (np.ndarray): The shell of the polygon. Expects a numpy array of shape (n, 2).
+            If the shape is (n, 1, 2), it will be reshaped to (n, 2). This is useful for cv2.findContours.
+        holes (list[np.ndarray]): The holes in the polygon.
+
         
     Returns:
         The minimum distance to the polygon edge, or None if the point is outside the polygon.
