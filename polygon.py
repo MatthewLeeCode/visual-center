@@ -13,6 +13,16 @@ class Polygon:
                 If the shape is (n, 1, 2), it will be reshaped to (n, 2). This is useful for cv2.findContours.
             holes (list[np.ndarray]): The holes in the polygon.
         """
+        # Reshape the shell if needed
+        if len(shell.shape) == 3:
+            shell = shell.reshape(shell.shape[0], 2)
+        
+        # Reshape the holes if needed
+        if len(holes) > 0:
+            for i, hole in enumerate(holes):
+                if len(hole.shape) == 3:
+                    holes[i] = hole.reshape(hole.shape[0], 2)
+        
         self.shell = shell
         self.holes = holes
         bbox = self._get_key_points()

@@ -78,7 +78,10 @@ def create_donut(inner_radius: int, outer_radius: int, num_points: int = 100) ->
     Returns:
         np.ndarray: A Polygon of the donut
     """
-    return Polygon(create_circle(outer_radius, num_points), [create_circle(inner_radius, num_points)])
+    outer_circle = create_circle(outer_radius, num_points)
+    inner_circle = create_circle(inner_radius, num_points)
+    donut = create_hole(outer_circle, inner_circle)
+    return donut
 
 
 def create_concave(num_points: int = 100) -> Polygon:
@@ -97,6 +100,20 @@ def create_concave(num_points: int = 100) -> Polygon:
         concave[i, 0] = 100 * np.cos(angle) + 50 * np.cos(5 * angle)
         concave[i, 1] = 100 * np.sin(angle) + 50 * np.sin(5 * angle)
     return Polygon(concave)
+
+
+def create_c_shape() -> Polygon:
+    """ C shape polygon. Centroid lands outside polygon. Pole should be center-left """
+    return Polygon(np.array([
+        [0, 0],
+        [100, 0],
+        [100, 100],
+        [0, 100],
+        [0, 50],
+        [50, 50],
+        [50, 50],
+        [50, 0]
+    ]))
 
 
 def create_hole(polygon: Polygon, hole: Polygon) -> Polygon:
