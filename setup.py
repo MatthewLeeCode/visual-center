@@ -10,7 +10,7 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/MatthewLeeCode/visual-center",
-    version='0.1.1',
+    version='0.1.2',
     packages=['visual_center'],
     install_requires=[
         'opencv-python==4.6.0.66'
