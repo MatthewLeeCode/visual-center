@@ -68,7 +68,7 @@ def save_image(filename:str, polygon:Polygon, pole:np.ndarray, distance:float, q
     pole = pole.astype(int)
     
     # Draw the polygon
-    cv2.fillPoly(image, [polygon.shell], (255, 255, 255, 255))
+    cv2.fillPoly(image, [polygon.shell], (200, 200, 200, 255))
     # Draw the holes
     for hole in polygon.holes:
         cv2.fillPoly(image, [hole], (0, 0, 0, 0))
