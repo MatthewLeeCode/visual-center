@@ -74,6 +74,8 @@ def save_image(filename:str, polygon:Polygon, pole:np.ndarray, distance:float, q
     for hole in polygon.holes:
         cv2.fillPoly(image, [hole], (0, 0, 0, 0))
     
+    
+    
     # Draw small blue circle at the centroid
     cv2.circle(image, (polygon.centroid[0], polygon.centroid[1]), 5, (255, 0, 0, 255), -1)
     
@@ -86,11 +88,11 @@ def save_image(filename:str, polygon:Polygon, pole:np.ndarray, distance:float, q
     
     # Save the image
     cv2.imwrite(filename, image)
-
+    
     # If quadtree is not None, draw the quadtree
     if quadtree is not None:
         quadtree.draw(image)
-    
+        
     filename = filename.replace(".png", "_quadtree.png")
     cv2.imwrite(filename, image)
     
@@ -101,7 +103,6 @@ def test_display_output() -> None:
     
     # Save image of square
     square = example_polys.create_rectangle(500, 500)
-    square = example_polys.scale(square, 2)
     pole, distance, tree = find_pole(square.shell, square.holes, precision=1, return_quadtree=True)
     save_image("tests/results/square.png", square, pole, distance, tree)
 
