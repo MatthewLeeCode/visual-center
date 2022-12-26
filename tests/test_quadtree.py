@@ -120,3 +120,19 @@ def test_display_output() -> None:
     pole, distance, tree = find_pole(irregular.shell, irregular.holes, precision=1, return_quadtree=True)
     save_image("tests/results/irregular.png", irregular, pole, distance, tree)
     
+    # Save image of circle with square holes
+    circle = example_polys.create_circle(500)
+    square1 = example_polys.create_rectangle(400, 250)
+    # Move square1 to center
+    square1 = example_polys.translate(square1, 200, 100)
+
+    square2 = example_polys.create_rectangle(150, 150)
+    # Move square2 to bottom right
+    square2 = example_polys.translate(square2, 550, 550)
+
+    # Create holes
+    circle = example_polys.create_hole(circle, square1)
+    circle = example_polys.create_hole(circle, square2)
+
+    pole, distance, tree = find_pole(circle.shell, circle.holes, precision=1, return_quadtree=True)
+    save_image("tests/results/circle_hole.png", circle, pole, distance, tree)
