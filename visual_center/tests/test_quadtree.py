@@ -1,9 +1,8 @@
-from quadtree import Quadtree, find_pole
-import tests.example_polys as example_polys
-from polygon import Polygon
+from visual_center.quadtree import Quadtree, find_pole
+import visual_center.tests.example_polys as example_polys
+from visual_center.polygon import Polygon
 import numpy as np
 import cv2
-import pytest
 
 
 def test_radius_calculation() -> None:
@@ -104,22 +103,22 @@ def test_display_output() -> None:
     # Save image of square
     square = example_polys.create_rectangle(500, 500)
     pole, distance, tree = find_pole(square.shell, square.holes, precision=1, return_quadtree=True)
-    save_image("tests/results/square.png", square, pole, distance, tree)
+    save_image("visual_center/tests/results/square.png", square, pole, distance, tree)
 
     # Save image of donut
     donut = example_polys.create_donut(100, 300, 100)
     donut = example_polys.scale(donut, 2)
     pole, distance, tree = find_pole(donut.shell, donut.holes, precision=1, return_quadtree=True)
-    save_image("tests/results/donut.png", donut, pole, distance, tree)
+    save_image("visual_center/tests/results/donut.png", donut, pole, distance, tree)
 
     # Save image of irregular polygon
-    image = cv2.imread("tests/images/irregular_shape.png")
+    image = cv2.imread("visual_center/tests/images/irregular_shape.png")
     # Convert image to black and white
     image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     irregular = example_polys.create_contour(image)
     irregular = example_polys.scale(irregular, 2)
     pole, distance, tree = find_pole(irregular.shell, irregular.holes, precision=1, return_quadtree=True)
-    save_image("tests/results/irregular.png", irregular, pole, distance, tree)
+    save_image("visual_center/tests/results/irregular.png", irregular, pole, distance, tree)
     
     # Save image of circle with square holes
     circle = example_polys.create_circle(500)
@@ -136,4 +135,4 @@ def test_display_output() -> None:
     circle = example_polys.create_hole(circle, square2)
 
     pole, distance, tree = find_pole(circle.shell, circle.holes, precision=1, return_quadtree=True)
-    save_image("tests/results/circle_hole.png", circle, pole, distance, tree)
+    save_image("visual_center/tests/results/circle_hole.png", circle, pole, distance, tree)

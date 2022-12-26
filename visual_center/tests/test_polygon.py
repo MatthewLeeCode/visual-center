@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-import tests.example_polys as example_poly
+import visual_center.tests.example_polys as example_poly
 
 
 def test_distance_square() -> None:
