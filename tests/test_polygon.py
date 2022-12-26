@@ -114,7 +114,7 @@ def test_distance_donut() -> None:
 def test_get_polygon_key_points() -> None:
     """ Tests the key points of a square. """
     square = example_poly.create_rectangle(100, 100)
-    key_points = square._get_bbox()
+    key_points = square._get_bounding_box()
     
     # Expected key points 
     # [x, y, width, height]
@@ -127,7 +127,7 @@ def test_get_polygon_key_points() -> None:
     
     # Test with a circle
     circle = example_poly.create_circle(100, 50)
-    key_points = circle._get_bbox()
+    key_points = circle._get_bounding_box()
     key_points = np.array(key_points).astype(int)
     
     # Expected key points

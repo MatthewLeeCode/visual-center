@@ -6,7 +6,7 @@ Implementation completely based off of the polylabel implementation: blog.mapbox
 All credit of the algorithm to them. I'm just a code monkey typing in numbers and hoping those numbers work.
 
 Also there already is a port of polylabel in python here: github.com/Twista/python-polylabel
-It works great! I just wanted to try and implement it myself. Also unsure how well it works with polygons with holes (Didn't try. It might. I don't know.)
+It works great! I just wanted to try and implement it myself
 """
 import numpy as np
 from polygon import Polygon
@@ -67,28 +67,32 @@ class Quadtree:
         # Return the new quadtree's
         return [self.ne, self.nw, self.se, self.sw]
     
-    def draw(self, image:np.ndarray) -> np.ndarray:
-        """ Draws the quadtree on the image. Including all subdivisions 
+    def draw(self, image:np.ndarray, color:tuple = (232, 122, 28, 255)) -> np.ndarray:
+        """ Recursively draws the quadtree on the image
         
         Args:
             image (np.ndarray): The image to draw on.
+            color (tuple): The color to draw the quadtree in.
 
         Returns:
-            The image with the quadtree drawn on it.
+            (np.ndarray) The image with the quadtree drawn on it.
         """
         # Draw box
         image = cv2.rectangle(image, 
             np.array((self.x - self.size//2, self.y - self.size//2), dtype=int), 
             np.array((self.x + self.size//2, self.y + self.size//2), dtype=int), 
-            (232, 122, 28, 255), 1)
+            color, 1)
+        
         # Draw center
-        image = cv2.circle(image, np.array((self.x, self.y), dtype=int), 1, (232, 122, 28, 255), -1)    
+        image = cv2.circle(image, np.array((self.x, self.y), dtype=int), 1, color, -1)  
+          
         # If subdivided, draw the subdivisions
         if self.divided:
             image = self.ne.draw(image)
             image = self.nw.draw(image)
             image = self.se.draw(image)
             image = self.sw.draw(image)
+        
         return image
     
 def find_pole(shell:np.ndarray, holes:np.ndarray=[], precision: int=1, return_quadtree:bool=False) -> np.array:
@@ -99,6 +103,12 @@ def find_pole(shell:np.ndarray, holes:np.ndarray=[], precision: int=1, return_qu
         shell (np.ndarray): The shell of the polygon.
         holes (np.ndarray): The holes in the polygon.
         precision (int): The precision of the quadtree. The lower the precision, the more accurate the result.
+        return_quadtree (bool): If true, the quadtree will be returned as well.
+    
+    Returns:
+        (np.ndarray) The pole of inaccessability of the polygon.
+        (float) The distance to the pole of inaccessability.
+        (Quadtree)[optional] The quadtree used to find the pole of inaccessability.
     """
     # Create polygon
     polygon:Polygon = Polygon(shell, holes)

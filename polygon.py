@@ -35,13 +35,13 @@ class Polygon:
             width (int): The width of the polygon.
             height (int): The height of the polygon.
         """
-        bbox = self._get_bbox()
+        bbox = self._get_bounding_box()
         self.centroid = np.array([bbox[0], bbox[1]], dtype=int)
         self.width = bbox[2]
         self.height = bbox[3]
     
-    def _get_bbox(self) -> list[np.ndarray]:
-        """ Gets the key points of a polygon.
+    def _get_bounding_box(self) -> list[np.ndarray]:
+        """ Gets the bounding box of the polygon
         
         Key points: x, y (centroid), width, height
         
@@ -50,7 +50,7 @@ class Polygon:
                 Holes are not required as they are not used in the calculation
         
         Returns:
-            A list of key points. [x(int), y(int), width(int), height(int)]
+            A list of key points. [x(int), y(int), width(float), height(float)]
         """
         
         min_x = self.shell[:, 0].min()
@@ -72,10 +72,6 @@ class Polygon:
         
         Args:
             point (np.ndarray): The point to calculate the distance to.
-            shell (np.ndarray): The shell of the polygon. Expects a numpy array of shape (n, 2).
-                If the shape is (n, 1, 2), it will be reshaped to (n, 2). This is useful for cv2.findContours.
-            holes (list[np.ndarray]): The holes in the polygon.
-
             
         Returns:
             The minimum distance to the polygon edge. Positive if the point is inside the polygon, negative if outside.
