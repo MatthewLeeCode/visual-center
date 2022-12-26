@@ -9,7 +9,7 @@ Also there already is a port of polylabel in python here: github.com/Twista/pyth
 It works great! I just wanted to try and implement it myself. Also unsure how well it works with polygons with holes (Didn't try. It might. I don't know.)
 """
 import numpy as np
-from .polygon import Polygon
+from polygon import Polygon
 import cv2
 from typing import TypeVar
 

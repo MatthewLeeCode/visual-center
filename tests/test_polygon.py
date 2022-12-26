@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-import visual_center.tests.example_polys as example_poly
+import tests.example_polys as example_poly
 
 
 def test_distance_square() -> None:
@@ -121,15 +121,16 @@ def test_get_polygon_key_points() -> None:
     # cv2 bounding rect always adds 1 more to width and height
     # It doesn't matter much for our use case
     
-    expected_key_points = np.array([50, 50, 101, 101])
+    expected_key_points = np.array([50, 50, 100, 100])
     
     assert np.all(key_points == expected_key_points), f"Expected key points {expected_key_points}, got {key_points}."
     
     # Test with a circle
     circle = example_poly.create_circle(100, 50)
     key_points = circle._get_bbox()
+    key_points = np.array(key_points).astype(int)
     
     # Expected key points
-    expected_key_points = np.array([100, 100, 201, 200])
+    expected_key_points = np.array([100, 99, 200.0, 199])
 
     assert np.all(key_points == expected_key_points), f"Expected key points {expected_key_points}, got {key_points}."

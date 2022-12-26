@@ -10,7 +10,7 @@ Additionally, any polygon can be used as a hole in any other polygon.
 """
 import numpy as np
 import cv2
-from visual_center.polygon import Polygon
+from polygon import Polygon
 
 
 def translate(polygon: Polygon, x: int, y: int) -> Polygon:
