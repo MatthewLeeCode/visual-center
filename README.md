@@ -41,6 +41,7 @@ Examples (Red dot is the pole. Red circle is the distance):
 <p float="left">
   <img src="tests/results/square.png" width="300" />
 </p>
+
 ### With a hole
 
 This is especially useful for polygons with holes.
@@ -64,7 +65,7 @@ pole, distance = visual_center.find_pole(polygon, holes)
 ```
 First param is the outer shell polygon. Second param is a list of holes.
 
-Examples with holes:
+Example with holes:
 <p float="left">
   <img src="tests/results/circle_hole.png" width="300" />
   <img src="tests/results/donut.png" width="300" /> 
