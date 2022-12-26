@@ -1,6 +1,6 @@
-from quadtree import Quadtree, find_pole, find_pole_polygon
-import tests.example_polys as example_polys
-from polygon import Polygon
+from visual_center.quadtree import Quadtree, find_pole
+import visual_center.tests.example_polys as example_polys
+from visual_center.polygon import Polygon
 import numpy as np
 import cv2
 import pytest
