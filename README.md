@@ -19,7 +19,7 @@ The visual center is the point in a polygon that is furthest from the polygon's 
 
 For example, the centroid (Blue dot) of this polygon lands outside of it. The visual center (Red dot) is the point that is furthest from the polygon's edge.
 
-![Picture of a C shape polygon. Centroid lands outside of the polygon](visual_center/tests/results/irregular.png)
+![Picture of a C shape polygon. Centroid lands outside of the polygon](https://github.com/MatthewLeeCode/visual-center/blob/main/visual_center/tests/results/irregular.png?raw=true)
 
 ## Usage
 ```python
@@ -39,7 +39,7 @@ pole, distance = visual_center.find_pole(polygon)
 
 Examples (Red dot is the pole. Red circle is the distance): 
 <p float="left">
-  <img src="visual_center/tests/results/square.png" width="300" />
+  <img src="https://github.com/MatthewLeeCode/visual-center/blob/main/visual_center/tests/results/square.png?raw=true" width="300" />
 </p>
 
 ### With a hole
@@ -67,8 +67,8 @@ First param is the outer shell polygon. Second param is a list of holes.
 
 Example with holes:
 <p float="left">
-  <img src="visual_center/tests/results/circle_hole.png" width="300" />
-  <img src="visual_center/tests/results/donut.png" width="300" /> 
+  <img src="https://github.com/MatthewLeeCode/visual-center/blob/main/visual_center/tests/results/circle_hole.png?raw=true" width="300" />
+  <img src="https://github.com/MatthewLeeCode/visual-center/blob/main/visual_center/tests/results/donut.png?raw=true" width="300" /> 
 </p>
 
 ## How does it work?
@@ -77,9 +77,9 @@ I highly suggest reading the original article: ['A new algorithm for finding a v
 tl;dr: Uses quadtree partitioning to recursively subdivide the polygon into smaller cells, probing the centers of these cells as candidates and discarding cells that cannot possibly contain a better solution.
 
 Here's some fun visualizations of the algorithm in action:
-![Picture of a C shape polygon. Centroid lands outside of the polygon](visual_center/tests/results/irregular_quadtree.png)
+![Picture of a C shape polygon. Centroid lands outside of the polygon](https://github.com/MatthewLeeCode/visual-center/blob/main/visual_center/tests/results/irregular_quadtree.png?raw=true)
 <p float="left">
-  <img src="visual_center/tests/results/circle_hole_quadtree.png" width="250" />
-  <img src="visual_center/tests/results/donut_quadtree.png" width="250" /> 
-  <img src="visual_center/tests/results/square_quadtree.png" width="250" />
+  <img src="https://github.com/MatthewLeeCode/visual-center/blob/main/visual_center/tests/results/circle_hole_quadtree.png?raw=true" width="250" />
+  <img src="https://github.com/MatthewLeeCode/visual-center/blob/main/visual_center/tests/results/donut_quadtree.png?raw=true" width="250" /> 
+  <img src="https://github.com/MatthewLeeCode/visual-center/blob/main/visual_center/tests/results/square_quadtree.png?raw=true" width="250" />
 </p>
