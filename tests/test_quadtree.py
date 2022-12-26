@@ -39,24 +39,61 @@ def test_find_pole_square() -> None:
     assert round(distance, 2) == 25, f"Expected 25, got {distance}"
     
 
-def save_image(filename:str, polygon:Polygon, pole:np.ndarray, distance:float) -> None:
-    """ Saves an image of the polygon and the pole. Use opencv"""
-    # Create a transparent image the size of the polygon
-    image = np.zeros((polygon.height, polygon.width, 4), np.uint8)
+def test_find_pole_donut() -> None:
+    """ Test the find_pole function """
+    donut = example_polys.create_donut(100, 300, 100)
+    shell = donut.shell
+    holes = donut.holes
+    # Find the pole
+    pole, distance = find_pole(shell, holes, precision=1)
+    # Check the pole
+    assert donut.signed_distance(pole.astype(int)) >= 0, f"Expected pole to be inside the shell"
+    assert distance >= 99 or distance <= 101, f"Expected distance in range 99-101, got {distance}"
+
+
+def save_image(filename:str, polygon:Polygon, pole:np.ndarray, distance:float, quadtree:Quadtree=None) -> None:
+    """ Saves an image of the polygon and the pole. Use opencv """
+    # Find min x and min y
+    min_x = np.min(polygon.shell[:, 0]).astype(int)
+    min_y = np.min(polygon.shell[:, 1]).astype(int)
+    max_x = np.max(polygon.shell[:, 0]).astype(int)
+    max_y = np.max(polygon.shell[:, 1]).astype(int)
+    
+    # Create a transparent image the size of the polygon 
+    # Using the polygons width, height, centroid.x and centroid.y
+    image = np.zeros((max_y + min_y, max_x + min_x, 4), dtype=np.uint8)
+
+    # Convert shell and holes to uint8  
+    polygon.shell = polygon.shell.astype(int)
+    polygon.holes = [hole.astype(int) for hole in polygon.holes]
+    pole = pole.astype(int)
+    
     # Draw the polygon
     cv2.fillPoly(image, [polygon.shell], (255, 255, 255, 255))
     # Draw the holes
     for hole in polygon.holes:
         cv2.fillPoly(image, [hole], (0, 0, 0, 0))
     
+    # Draw small blue circle at the centroid
+    cv2.circle(image, (polygon.centroid[0], polygon.centroid[1]), 5, (255, 0, 0, 255), -1)
+    
     # Draw small circle at the pole
     cv2.circle(image, (pole[0], pole[1]), 5, (0, 0, 255, 255), -1)
     
     # Draw a non filled circle for the distance
-    cv2.circle(image, (pole[0], pole[1]), int(distance), (0, 0, 255, 255), 1)
+    if distance > 0:
+        cv2.circle(image, (pole[0], pole[1]), int(distance), (0, 0, 255, 255), 1)
     
     # Save the image
     cv2.imwrite(filename, image)
+
+    # If quadtree is not None, draw the quadtree
+    if quadtree is not None:
+        quadtree.draw(image)
+    
+    filename = filename.replace(".png", "_quadtree.png")
+    cv2.imwrite(filename, image)
+    
     
 
 def test_display_output() -> None:
@@ -64,6 +101,22 @@ def test_display_output() -> None:
     
     # Save image of square
     square = example_polys.create_rectangle(500, 500)
-    pole, distance = find_pole_polygon(square, precision=1)
-    save_image("tests/results/square.png", square, pole, distance)
+    square = example_polys.scale(square, 2)
+    pole, distance, tree = find_pole(square.shell, square.holes, precision=1, return_quadtree=True)
+    save_image("tests/results/square.png", square, pole, distance, tree)
+
+    # Save image of donut
+    donut = example_polys.create_donut(100, 300, 100)
+    donut = example_polys.scale(donut, 2)
+    pole, distance, tree = find_pole(donut.shell, donut.holes, precision=1, return_quadtree=True)
+    save_image("tests/results/donut.png", donut, pole, distance, tree)
+
+    # Save image of irregular polygon
+    image = cv2.imread("tests/images/irregular_shape.png")
+    # Convert image to black and white
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    irregular = example_polys.create_contour(image)
+    irregular = example_polys.scale(irregular, 2)
+    pole, distance, tree = find_pole(irregular.shell, irregular.holes, precision=1, return_quadtree=True)
+    save_image("tests/results/irregular.png", irregular, pole, distance, tree)
     

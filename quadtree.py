@@ -10,6 +10,7 @@ It works great! I just wanted to try and implement it myself. Also unsure how we
 """
 import numpy as np
 from polygon import Polygon
+import cv2
 from typing import TypeVar
 
 TQuadtree = TypeVar("TQuadtree", bound="Quadtree")
@@ -52,13 +53,13 @@ class Quadtree:
             A list of the new quadtree's. [NE, NW, SE, SW]
         """
         # Calculate the new width and height
-        size = self.size / 2
+        size = self.size
         
         # Create the new quadtree's
-        self.ne = Quadtree(self.polygon, self.x + size, self.y - size, size, self.precision)
-        self.nw = Quadtree(self.polygon, self.x - size, self.y - size, size, self.precision)
-        self.se = Quadtree(self.polygon, self.x + size, self.y + size, size, self.precision)
-        self.sw = Quadtree(self.polygon, self.x - size, self.y + size, size, self.precision)
+        self.ne = Quadtree(self.polygon, self.x + size/4, self.y - size/4, size/2, self.precision)
+        self.nw = Quadtree(self.polygon, self.x - size/4, self.y - size/4, size/2, self.precision)
+        self.se = Quadtree(self.polygon, self.x + size/4, self.y + size/4, size/2, self.precision)
+        self.sw = Quadtree(self.polygon, self.x - size/4, self.y + size/4, size/2, self.precision)
         
         # Mark as divided
         self.divided = True
@@ -66,8 +67,31 @@ class Quadtree:
         # Return the new quadtree's
         return [self.ne, self.nw, self.se, self.sw]
     
+    def draw(self, image:np.ndarray) -> np.ndarray:
+        """ Draws the quadtree on the image. Including all subdivisions 
+        
+        Args:
+            image (np.ndarray): The image to draw on.
+
+        Returns:
+            The image with the quadtree drawn on it.
+        """
+        # Draw box
+        image = cv2.rectangle(image, 
+            np.array((self.x - self.size//2, self.y - self.size//2), dtype=int), 
+            np.array((self.x + self.size//2, self.y + self.size//2), dtype=int), 
+            (232, 122, 28, 255), 1)
+        # Draw center
+        image = cv2.circle(image, np.array((self.x, self.y), dtype=int), 1, (232, 122, 28, 255), -1)    
+        # If subdivided, draw the subdivisions
+        if self.divided:
+            image = self.ne.draw(image)
+            image = self.nw.draw(image)
+            image = self.se.draw(image)
+            image = self.sw.draw(image)
+        return image
     
-def find_pole(shell:np.ndarray, holes:np.ndarray=[], precision: int=1) -> np.array:
+def find_pole(shell:np.ndarray, holes:np.ndarray=[], precision: int=1, return_quadtree:bool=False) -> np.array:
     """
     Approximate the pole of inaccessability of the polygon.
     
@@ -81,15 +105,15 @@ def find_pole(shell:np.ndarray, holes:np.ndarray=[], precision: int=1) -> np.arr
     
     # Create the quadtree
     size:int = max(polygon.width, polygon.height) # Size of the first quad in the tree
-    
+     
     # Create the first quadtree to cover the polygon
-    qt:Quadtree = Quadtree(polygon, polygon.centroid[0], polygon.centroid[1], size, precision)
+    root:Quadtree = Quadtree(polygon, polygon.centroid[0], polygon.centroid[1], size, precision)
     
     # The largest quadtree distance to the polygon so far
-    best_quad:Quadtree = qt
+    best_quad:Quadtree = root
     
     # Queue is used to store the quadtree's that need to be checked
-    queue:list = [qt]
+    queue:list = [root]
     
     while len(queue):
         # Get the first quadtree in the queue
@@ -112,6 +136,8 @@ def find_pole(shell:np.ndarray, holes:np.ndarray=[], precision: int=1) -> np.arr
         # Subdivide the quadtree
         queue.extend(qt.subdivide())
     
+    if return_quadtree:
+        return np.array([best_quad.x, best_quad.y]), best_quad.distance, root
     return np.array([best_quad.x, best_quad.y]), best_quad.distance
 
 

@@ -25,12 +25,22 @@ class Polygon:
         
         self.shell = shell
         self.holes = holes
-        bbox = self._get_key_points()
-        self.centroid = np.array([bbox[0], bbox[1]], dtype=np.uint8)
+        self._calculate_key_points()
+    
+    def _calculate_key_points(self):
+        """ Calculates the key points of the polygon.
+        
+        Points:
+            centroid (np.ndarray): The centroid of the polygon.
+            width (int): The width of the polygon.
+            height (int): The height of the polygon.
+        """
+        bbox = self._get_bbox()
+        self.centroid = np.array([bbox[0], bbox[1]], dtype=int)
         self.width = bbox[2]
         self.height = bbox[3]
-        
-    def _get_key_points(self) -> list[np.ndarray]:
+    
+    def _get_bbox(self) -> list[np.ndarray]:
         """ Gets the key points of a polygon.
         
         Key points: x, y (centroid), width, height
@@ -42,10 +52,16 @@ class Polygon:
         Returns:
             A list of key points. [x(int), y(int), width(int), height(int)]
         """
-        # Get the bounding box
-        x, y, width, height = cv2.boundingRect(self.shell)
-        # Get the centroid
-        centroid = np.array([x + width/2, y + height/2], dtype=np.uint8)
+        
+        min_x = self.shell[:, 0].min()
+        max_x = self.shell[:, 0].max()
+        min_y = self.shell[:, 1].min()
+        max_y = self.shell[:, 1].max()
+        width = max_x - min_x
+        height = max_y - min_y
+        x = min_x + width // 2
+        y = min_y + height // 2
+        centroid = np.array([x, y], dtype=int)
         # Return the key points
         return [*centroid, width, height] # Width and height are always 1 more for some reason
 
@@ -64,8 +80,8 @@ class Polygon:
         Returns:
             The minimum distance to the polygon edge. Positive if the point is inside the polygon, negative if outside.
         """
-        # Ensure point is of type uint8
-        point = point.astype(np.uint8)
+        # Ensure point is of type 
+        point = np.array(point, dtype=np.float32)
         
         # Calculate the distance to the shell
         min_dist = cv2.pointPolygonTest(self.shell, point, True)  

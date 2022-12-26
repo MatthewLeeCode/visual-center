@@ -9,7 +9,51 @@ The following polygons can be created:
 Additionally, any polygon can be used as a hole in any other polygon.
 """
 import numpy as np
+import cv2
 from polygon import Polygon
+
+
+def translate(polygon: Polygon, x: int, y: int) -> Polygon:
+    """ Translates the polygon by the given x and y values.
+
+    Args:
+        polygon (Polygon): The polygon to translate.
+        x (int): The x value to translate by.
+        y (int): The y value to translate by.
+
+    Returns:
+        Polygon: The translated polygon.
+    """
+    # Translate the polygon
+    polygon.shell[:, 0] += x
+    polygon.shell[:, 1] += y
+    for hole in polygon.holes:
+        hole[:, 0] += x
+        hole[:, 1] += y
+        
+    polygon._calculate_key_points()
+    return polygon
+
+
+def scale(polygon: Polygon, scale: float) -> Polygon:
+    """ Scales the polygon by the given scale.
+
+    Args:
+        polygon (Polygon): The polygon to scale.
+        scale (float): The scale to scale by.
+
+    Returns:
+        Polygon: The scaled polygon.
+    """
+    # Scale the polygon
+    polygon.shell[:, 0] *= scale
+    polygon.shell[:, 1] *= scale
+    for hole in polygon.holes:
+        hole[:, 0] *= scale
+        hole[:, 1] *= scale
+        
+    polygon._calculate_key_points()
+    return polygon
 
 
 def create_rectangle(width: int, height: int) -> Polygon:
@@ -46,25 +90,27 @@ def create_circle(radius: int, num_points: int = 100) -> Polygon:
         angle = 2 * np.pi * i / num_points
         circle[i, 0] = radius * np.cos(angle)
         circle[i, 1] = radius * np.sin(angle)
-    return Polygon(circle)
+    
+    # Translate to the center
+    circle = translate(Polygon(circle), radius, radius)
+    return circle
 
 
-def create_hexagon(radius: int) -> Polygon:
-    """ Creates a hexagon with the given radius.
+def create_contour(image:np.ndarray) -> Polygon:
+    """ Creates a contour from the given image.
 
     Args:
-        radius (int): The radius of the hexagon.
+        image (np.ndarray): The image to create the contour from.
 
     Returns:
-        A Polygon of the hexagon.
+        A Polygon of the contour.
     """
-    # Create a hexagon with the given radius
-    hexagon = np.zeros((6, 2), dtype=np.float32)
-    for i in range(6):
-        angle = 2 * np.pi * i / 6
-        hexagon[i, 0] = radius * np.cos(angle)
-        hexagon[i, 1] = radius * np.sin(angle)
-    return Polygon(hexagon)
+    # Convert to float
+    image = image.astype(np.uint8)
+    # Find the contour
+    contours, _ = cv2.findContours(image, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    contour = Polygon(contours[0])
+    return contour
 
 
 def create_donut(inner_radius: int, outer_radius: int, num_points: int = 100) -> Polygon:
@@ -80,40 +126,10 @@ def create_donut(inner_radius: int, outer_radius: int, num_points: int = 100) ->
     """
     outer_circle = create_circle(outer_radius, num_points)
     inner_circle = create_circle(inner_radius, num_points)
+    # Translate inner circle to center of outer circle
+    inner_circle = translate(inner_circle, outer_radius - inner_radius, outer_radius - inner_radius)
     donut = create_hole(outer_circle, inner_circle)
     return donut
-
-
-def create_concave(num_points: int = 100) -> Polygon:
-    """ Creates a concave polygon.
-
-    Args:
-        num_points (int): The number of points to use to approximate the polygon.
-
-    Returns:
-        A Polygon of the polygon.
-    """
-    # Create a concave polygon
-    concave = np.zeros((num_points, 2), dtype=np.float32)
-    for i in range(num_points):
-        angle = 2 * np.pi * i / num_points
-        concave[i, 0] = 100 * np.cos(angle) + 50 * np.cos(5 * angle)
-        concave[i, 1] = 100 * np.sin(angle) + 50 * np.sin(5 * angle)
-    return Polygon(concave)
-
-
-def create_c_shape() -> Polygon:
-    """ C shape polygon. Centroid lands outside polygon. Pole should be center-left """
-    return Polygon(np.array([
-        [0, 0],
-        [100, 0],
-        [100, 100],
-        [0, 100],
-        [0, 50],
-        [50, 50],
-        [50, 50],
-        [50, 0]
-    ]))
 
 
 def create_hole(polygon: Polygon, hole: Polygon) -> Polygon:

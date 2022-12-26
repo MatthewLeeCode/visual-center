@@ -8,7 +8,7 @@ except IOError:
 
 setup(
     name="visual-center",
-    version="0.1.0",
+    version="1.0.0",
     description="Finds the visual center of a polygon",
     license="MIT",
     author="Matthew Lee",
